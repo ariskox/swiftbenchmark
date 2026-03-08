@@ -167,3 +167,7 @@ At the end, the script prints:
 Duration format example: `02:37 (157s)`
 
 The clean step duration is intentionally not included in measured compile time.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
