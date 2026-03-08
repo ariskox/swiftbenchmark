@@ -1,0 +1,5 @@
+# Generated benchmark projects
+Benchmarks/
+
+# Generated shared Swift source pool
+swift_tasks_7000/

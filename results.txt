@@ -1,0 +1,70 @@
+
+No batch parameter specified
+
+Compilation results
+#	Benchmark	Status	Duration
+1	Project7_64Targets_Approx110x64	ok	01:56	116
+2	Project6_32Targets_Approx218x32	ok	01:40	100
+3	Project5_16Targets_Approx438x16	ok	01:31	91
+4	Project4_8Targets_875x8	ok	01:31	91
+5	Project3_4Targets_1750x4	ok	01:40	100
+6	Project2_2Targets_3500x2	ok	02:05	125
+7	Project1_1Target_7000	ok	02:49	169
+
+
+Compilation results
+#	Benchmark	Status	Duration
+1	Project7_64Targets_Approx110x64	ok	02:02	122
+2	Project6_32Targets_Approx218x32	ok	01:45	105
+3	Project9_24Targets_Approx291x24	ok	01:35	95
+4	Project5_16Targets_Approx438x16	ok	01:34	94
+5	Project8_12Targets_Approx583x12	ok	01:38	98
+6	Project4_8Targets_875x8	ok	01:37	97
+7	Project3_4Targets_1750x4	ok	01:54	114
+8	Project2_2Targets_3500x2	ok	02:10	130
+9	Project1_1Target_7000	ok	03:02	182
+
+Total measured compile time: 17:17	1037
+Overall result: SUCCESS
+
+
+
+
+--driver-batch-size-limit default = 25
+
+
+
+Compilation results
+#	Benchmark	Status	Duration
+1	Project7_64Targets_Approx110x64	ok	01:58	118
+2	Project6_32Targets_Approx218x32	ok	01:43	103
+3	Project9_24Targets_Approx291x24	ok	01:34	94
+4	Project5_16Targets_Approx438x16	ok	01:35	95
+5	Project8_12Targets_Approx583x12	ok	01:37	97
+6	Project4_8Targets_875x8	ok	01:37	97
+7	Project3_4Targets_1750x4	ok	01:46	106
+8	Project2_2Targets_3500x2	ok	02:08	128
+9	Project1_1Target_7000	ok	03:13	193
+
+Total measured compile time: 17:11	1031
+Overall result: SUCCESS
+
+
+
+--driver-batch-size-limit 75
+
+Compilation results
+#	Benchmark	Status	Duration
+1	Project7_64Targets_Approx110x64	ok	02:00	120
+2	Project6_32Targets_Approx218x32	ok	01:47	107
+3	Project9_24Targets_Approx291x24	ok	01:41	101
+4	Project5_16Targets_Approx438x16	ok	01:44	104
+5	Project8_12Targets_Approx583x12	ok	01:45	105
+6	Project4_8Targets_875x8	ok	01:30	90
+7	Project3_4Targets_1750x4	ok	01:40	100
+8	Project2_2Targets_3500x2	ok	01:57	117
+9	Project1_1Target_7000	ok	02:41	161
+
+Total measured compile time: 16:45	1005
+Overall result: SUCCESS
+
