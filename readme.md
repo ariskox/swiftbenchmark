@@ -1,173 +1,106 @@
 # SwiftPM Compilation Benchmark (7000 Swift Files)
 
-This workspace benchmarks Swift compilation time across 9 Swift Package Manager project shapes, while keeping the total source file count constant (7000 files).
+I put this repo together to answer a simple question: how much does Swift compile time change when you split the same amount of code across different numbers of targets?
 
-## What Is Implemented
+Every benchmark shape keeps the total source count fixed at `7000` Swift files, pulled from `swift_tasks_7000/`. The only thing that changes is package layout.
 
-The benchmark matrix is generated under `Benchmarks/`:
+## Benchmark Shapes
 
-1. `Project1_1Target_7000`: 1 target, 7000 files
-2. `Project2_2Targets_3500x2`: 2 targets, 3500 files each
-3. `Project3_4Targets_1750x4`: 4 targets, 1750 files each
-4. `Project4_8Targets_875x8`: 8 targets, 875 files each
-5. `Project5_16Targets_Approx438x16`: 16 targets, approx 438 files each
-6. `Project6_32Targets_Approx218x32`: 32 targets, approx 218 files each
-7. `Project7_64Targets_Approx110x64`: 64 targets, approx 110 files each
-8. `Project8_12Targets_Approx583x12`: 12 targets, approx 583 files each
-9. `Project9_24Targets_Approx291x24`: 24 targets, approx 291 files each
+Generated under `Benchmarks/`:
 
-All projects reuse the same shared source pool from `swift_tasks_7000/`.
+1. `Project1_1Target_7000` (1 x 7000)
+2. `Project2_2Targets_3500x2` (2 x 3500)
+3. `Project3_4Targets_1750x4` (4 x 1750)
+4. `Project4_8Targets_875x8` (8 x 875)
+5. `Project5_16Targets_Approx438x16` (16 x ~438)
+6. `Project6_32Targets_Approx218x32` (32 x ~218)
+7. `Project7_64Targets_Approx110x64` (64 x ~110)
+8. `Project8_12Targets_Approx583x12` (12 x ~583)
+9. `Project9_24Targets_Approx291x24` (24 x ~291)
 
-For multi-target projects, each target depends on the previous target in a chain, so one `swift build` compiles the full graph.
+For multi-target cases, dependencies are chained target-to-target so a single `swift build` traverses the full graph.
 
 ## Scripts
 
-- `setup_spm_benchmarks.sh`
-	Creates or refreshes all 9 benchmark projects from `swift_tasks_7000/`.
+- `setup_spm_benchmarks.sh`: creates or refreshes all benchmark projects from the shared source pool.
+- `run_spm_benchmarks.sh`: runs clean + build per project, times compile duration, and prints a compact summary table.
 
-- `run_spm_benchmarks.sh`
-	Cleans each project and compiles benchmarks one by one, measures compile duration, and prints a tab-separated summary that is aligned for terminal readability.
+## Quick Start
 
-## Run In A Clean Directory
+From repo root:
 
-This section assumes you are in the repository root.
-
-### 1. Ensure the shared 7000-file source pool exists
-
-Required folder:
-
-- `swift_tasks_7000/`
-
-Validate count:
+1. Confirm the source pool exists and has 7000 files.
 
 ```bash
 find swift_tasks_7000 -maxdepth 1 -type f -name 'GeneratedTask*.swift' | wc -l
 ```
 
-Expected result: `7000`
+Expected: `7000`
 
-If this is a fresh clone and `swift_tasks_7000/` is missing, first generate or copy the 7000 files into that folder before continuing.
-
-### 2. Clean previous benchmark output
+2. Recreate benchmark projects.
 
 ```bash
 rm -rf Benchmarks
-```
-
-### 3. Generate all benchmark projects
-
-```bash
 ./setup_spm_benchmarks.sh
 ```
 
-This creates all 9 project folders under `Benchmarks/` and distributes files according to each target layout.
-
-## Validate Setup Output
-
-### Validate project directories were created
-
-```bash
-find Benchmarks -mindepth 1 -maxdepth 1 -type d | wc -l
-```
-
-Expected result: `9`
-
-### Validate each package resolves
-
-```bash
-for p in \
-	Benchmarks/Project1_1Target_7000 \
-	Benchmarks/Project2_2Targets_3500x2 \
-	Benchmarks/Project3_4Targets_1750x4 \
-	Benchmarks/Project4_8Targets_875x8 \
-	Benchmarks/Project5_16Targets_Approx438x16 \
-	Benchmarks/Project6_32Targets_Approx218x32 \
-	Benchmarks/Project7_64Targets_Approx110x64 \
-	Benchmarks/Project8_12Targets_Approx583x12 \
-	Benchmarks/Project9_24Targets_Approx291x24
-do
-	echo "== $p =="
-	(cd "$p" && swift package describe >/dev/null && echo OK)
-done
-```
-
-Expected result: all projects print `OK`.
-
-## Execute The Benchmark
-
-### Full run (default: debug)
+3. Run the benchmark.
 
 ```bash
 ./run_spm_benchmarks.sh
 ```
 
-Equivalent explicit variant selection:
+## Useful Run Variants
 
-```bash
-./run_spm_benchmarks.sh --build-variant default
-```
-
-### Full run in release mode
+Release build:
 
 ```bash
 ./run_spm_benchmarks.sh --configuration release
 ```
 
-### Run with Swift batch mode enabled
+Batch mode:
 
 ```bash
 ./run_spm_benchmarks.sh --build-variant batch
 ./run_spm_benchmarks.sh --configuration release --build-variant batch
 ```
 
-### Run with Swift batch mode and batch-size limit
-
-Use `--build-variant batch-size-limit` and pass `XX` through `--batch-size-limit`.
+Batch mode with explicit size limit:
 
 ```bash
 ./run_spm_benchmarks.sh --build-variant batch-size-limit --batch-size-limit 75
 ./run_spm_benchmarks.sh --configuration release --build-variant batch-size-limit --batch-size-limit 100
 ```
 
-### Run specific benchmark shapes only
-
-Use target counts with `--targets`.
+Run only selected layouts (in the exact order you pass):
 
 ```bash
-./run_spm_benchmarks.sh --targets 32
 ./run_spm_benchmarks.sh --targets 64,24,12,8
-./run_spm_benchmarks.sh --targets 64,24,16,12,2 --configuration release
+./run_spm_benchmarks.sh --targets 32 --configuration release
 ```
 
-Notes:
+Allowed target values: `64,32,24,16,12,8,4,2,1`
 
-- Allowed values: `64,32,24,16,12,8,4,2,1`
-- Comma-separated values are executed in exactly the order you provide.
+## Output Notes
 
-Build variant notes:
+Per benchmark, the runner:
 
-- `--build-variant` allowed values: `default`, `batch`, `batch-size-limit`
-- `--batch-size-limit` is required only with `--build-variant batch-size-limit`
-- `--batch-size-limit` must not be used with other build variants
+1. cleans (`swift package clean`)
+2. builds (`swift build` + selected flags)
+3. prints a short error excerpt if a build fails
 
-## What The Runner Reports
-
-For each selected benchmark:
-
-1. Clean step (`swift package clean`) is executed and reported.
-2. Compile step is timed (`swift build -c <configuration>` plus any selected build-variant flags).
-3. On failure, a short error excerpt is shown.
-
-At the end, the script prints:
-
-- Per-benchmark tab-separated rows (`#`, `Benchmark`, `Status`, `Duration`, `Seconds`) with terminal-aligned display when `column` is available
-- Total measured compile time
-- Overall success or failure result
+The final summary includes per-project duration plus total measured compile time.
 
 Duration format example: `02:37 (157s)`
 
-The clean step duration is intentionally not included in measured compile time.
+Clean time is not included in measured compile time.
+
+## Results
+
+Latest benchmark chart:
+
+![SwiftPM benchmark results](results.png)
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT, see [`LICENSE`](LICENSE).
